@@ -1,2 +1,2 @@
-# demo_claudeAI
+# Demo ClaudeAI
 Demo code by claude AI

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Lập Trình: Cuộc Phiêu Lưu Số</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .story-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+            text-align: left;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            font-size: 0.9em;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block::before {
+            content: 'Thử Thách Code';
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .choice-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+
+        .correct {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .incorrect {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .progress-bar {
+            background: #ecf0f1;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(155, 89, 182, 0.3);
+        }
+
+        .concept-explanation {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .choice-btn {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🚀 Hành Trình Code</h1>
+        <p class="subtitle">Học Lập Trình Qua Phiêu Lưu!</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number" id="levelDisplay">1</span>
+                <span>Cấp Độ</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="scoreDisplay">0</span>
+                <span>Điểm Số</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="conceptsDisplay">0</span>
+                <span>Khái Niệm Đã Học</span>
+            </div>
+        </div>
+
+        <div id="gameContent">
+            <!-- Game content will be inserted here -->
+        </div>
+
+        <button class="restart-btn" onclick="restartGame()" style="display: none;" id="restartBtn">
+            🔄 Bắt Đầu Cuộc Phiêu Lưu Mới
+        </button>
+    </div>
+
+    <script>
+        // Trạng thái game
+        let gameState = {
+            level: 1,
+            score: 0,
+            conceptsLearned: 0,
+            playerName: '',
+            inventory: []
+        };
+
+        // Dữ liệu câu chuyện với các khái niệm lập trình
+        const storyData = {
+            1: {
+                title: "🌟 Chào Mừng Đến Vương Quốc Code!",
+                story: `Bạn là Minh, một nhà phiêu lưu trẻ tuổi đã khám phá ra một vương quốc kỳ diệu nơi mọi thứ đều hoạt động bằng code! Các hệ thống ma thuật của vương quốc đang gặp trục trặc, và chỉ có người hiểu lập trình mới có thể cứu được nó.
+
+Khi bước vào Vương Quốc Code huyền bí, bạn gặp Luna, một pháp sư code khôn ngoan giải thích: "Để khôi phục vương quốc của chúng ta, bạn phải thành thạo nghệ thuật cổ xưa của Biến Số - những chiếc hộp ma thuật chứa các giá trị kỳ diệu!"`,
+                
+                codeChallenge: `// Phép thuật đầu tiên của bạn - tạo biến số!
+let tenNguoiHung = "Minh";
+let capDoNguoiHung = 1;
+let sucManhPhepThuat = 50;
+
+// Đoạn code này làm gì?`,
+                
+                explanation: "Biến số giống như những chiếc hộp ma thuật lưu trữ thông tin. Trong phép thuật này, chúng ta đang tạo ra ba chiếc hộp: một cho tên bạn, một cho cấp độ, và một cho sức mạnh phép thuật!",
+                
+                choices: [
+                    { text: "Nó tạo ra ba chiếc hộp để lưu trữ dữ liệu phiêu lưu của tôi", correct: true, points: 10 },
+                    { text: "Nó tạo ra ba phép thuật để thi triển ma pháp", correct: false, points: 0 },
+                    { text: "Nó xóa thông tin khỏi vương quốc", correct: false, points: 0 }
+                ]
+            },
+            
+            2: {
+                title: "🏰 Lâu Đài Điều Kiện",
+                story: `Xuất sắc! Luna mỉm cười khi phép thuật đầu tiên của bạn thành công. "Bây giờ," cô nói, "bạn phải đối mặt với Lâu Đài Điều Kiện, nơi các quyết định định hình thực tại!"
+
+Cổng lâu đài có một ổ khóa ma thuật chỉ mở dựa trên những điều kiện nhất định. Bạn tiến đến và thấy những ký tự cổ xưa trông giống như code...`,
+                
+                codeChallenge: `// Logic ma thuật của cổng lâu đài
+let mauChiaKhoa = "vang";
+let nguoiChoiCoChiaKhoa = true;
+
+if (mauChiaKhoa === "vang" && nguoiChoiCoChiaKhoa === true) {
+    console.log("Cổng mở ra với tiếng chuông ma thuật!");
+} else {
+    console.log("Cổng vẫn khóa chặt...");
+}
+
+// Điều gì xảy ra khi phép thuật này được thi triển?`,
+                
+                explanation: "Câu lệnh điều kiện (if/else) giống như những nhà ra quyết định ma thuật! Chúng kiểm tra xem các điều kiện có đúng không và sau đó quyết định hành động nào sẽ thực hiện. Đó chính là cách chương trình đưa ra những lựa chọn thông minh!",
+                
+                choices: [
+                    { text: "Cổng mở ra vì cả hai điều kiện đều đúng", correct: true, points: 15 },
+                    { text: "Cổng vẫn khóa vì chìa khóa sai", correct: false, points: 0 },
+                    { text: "Phép thuật tạo ra một cánh cổng mới", correct: false, points: 0 }
+                ]
+            },
+            
+            3: {
+                title: "🔄 Mê Cung Vòng Lặp",
+                story: `Cổng lâu đài mở ra với tiếng chuông du dương! Bên trong, bạn khám phá ra Mê Cung Vòng Lặp - một mê cung kỳ diệu nơi các mẫu hình lặp lại vô tận.
+
+"Cẩn thận!" Luna cảnh báo. "Mê cung này chỉ có thể được vượt qua bằng cách hiểu sức mạnh của Vòng Lặp - những phép thuật tự động lặp lại các hành động!"
+
+Bạn thấy một mẫu hình của những viên đá phát sáng dường như lặp lại...`,
+                
+                codeChallenge: `// Thắp sáng con đường qua mê cung
+for (let vienda = 1; vienda <= 5; vienda++) {
+    console.log("Thắp sáng viên đá số " + vienda);
+}
+
+// Có bao nhiêu viên đá sẽ được thắp sáng bởi phép thuật này?`,
+                
+                explanation: "Vòng lặp thật ma thuật! Chúng cho phép bạn lặp lại các hành động mà không cần viết cùng một đoạn code nhiều lần. 'Vòng lặp for' này đếm từ 1 đến 5 và tự động thắp sáng mỗi viên đá!",
+                
+                choices: [
+                    { text: "5 viên đá sẽ được thắp sáng", correct: true, points: 20 },
+                    { text: "1 viên đá sẽ được thắp sáng", correct: false, points: 0 },
+                    { text: "Phép thuật chạy mãi mãi", correct: false, points: 0 }
+                ]
+            },
+            
+            4: {
+                title: "🎯 Pháo Đài Hàm Số",
+                story: `Tuyệt vời! Mê cung nhận ra sự thành thạo của bạn về vòng lặp và cho phép bạn đi qua. Bạn đến thử thách cuối cùng: Pháo Đài Hàm Số!
+
+"Hàm số," Luna giải thích, "giống như công thức pha chế phép thuật. Bạn viết chúng một lần, nhưng có thể sử dụng nhiều lần với các nguyên liệu khác nhau!"
+
+Người canh gác pháo đài đưa cho bạn một cuộn giấy ma thuật...`,
+                
+                codeChallenge: `// Công thức phép thuật (hàm số) để tính sức mạnh ma pháp
+function tinhSucManhMaPhap(sucmanhcoban, capdo) {
+    let tongSucManh = sucmanhcoban * capdo;
+    return tongSucManh;
+}
+
+// Sử dụng công thức phép thuật
+let sucManhCuaToi = tinhSucManhMaPhap(50, 3);
+
+// sucManhCuaToi sẽ bằng bao nhiêu?`,
+                
+                explanation: "Hàm số là những khối code có thể tái sử dụng - giống như có một công thức bạn có thể dùng đi dùng lại! Hàm số này nhận hai nguyên liệu (sucmanhcoban và capdo) và trả về tích của chúng.",
+                
+                choices: [
+                    { text: "150 (vì 50 × 3 = 150)", correct: true, points: 25 },
+                    { text: "53 (vì 50 + 3 = 53)", correct: false, points: 0 },
+                    { text: "Hàm số không hoạt động", correct: false, points: 0 }
+                ]
+            },
+            
+            5: {
+                title: "👑 Vương Quốc Được Phục Hồi!",
+                story: `🎉 CHÚC MỪNG! 🎉
+
+Sự thành thạo của bạn về các khái niệm lập trình đã cứu được Vương Quốc Code! Các hệ thống ma thuật hoạt động trở lại, và những công dân biết ơn hò reo tên bạn!
+
+Luna rạng rỡ tự hào: "Bạn đã học được bốn trụ cột của lập trình:
+• Biến Số - lưu trữ thông tin
+• Điều Kiện - đưa ra quyết định  
+• Vòng Lặp - lặp lại các hành động
+• Hàm Số - các khối code tái sử dụng"
+
+Vương quốc đã an toàn, và bạn đã trở thành một Pháp Sư Code thực thụ! Sẵn sàng cho cuộc phiêu lưu tiếp theo chưa?`,
+                
+                codeChallenge: `// Phép thuật cuối cùng của bạn - một chương trình hoàn chỉnh!
+let nguoiHung = "Minh Pháp Sư Code";
+let thangLoi = true;
+
+function cheToChienThang(tenNguoiHung) {
+    for (let tiengHo = 1; tiengHo <= 3; tiengHo++) {
+        if (thangLoi === true) {
+            console.log("🎉 Hoan hô " + tenNguoiHung + "!");
+        }
+    }
+}
+
+cheToChienThang(nguoiHung);
+
+// Điều này kết hợp tất cả các khái niệm bạn đã học!`,
+                
+                explanation: "Tuyệt vời! Bạn đã kết hợp biến số, điều kiện, vòng lặp và hàm số thành một phép thuật mạnh mẽ. Bây giờ bạn đã sẵn sàng để đối phó với những thử thách lập trình thực sự!",
+                
+                choices: [
+                    { text: "Bắt đầu một cuộc phiêu lưu mới!", correct: true, points: 30 }
+                ]
+            }
+        };
+
+        // Khởi tạo game
+        function initGame() {
+            updateDisplay();
+            loadLevel(1);
+        }
+
+        // Cập nhật các phần tử hiển thị
+        function updateDisplay() {
+            document.getElementById('levelDisplay').textContent = gameState.level;
+            document.getElementById('scoreDisplay').textContent = gameState.score;
+            document.getElementById('conceptsDisplay').textContent = gameState.conceptsLearned;
+            
+            const progress = (gameState.level - 1) / 4 * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Tải một cấp độ cụ thể
+        function loadLevel(levelNum) {
+            const level = storyData[levelNum];
+            if (!level) return;
+
+            const gameContent = document.getElementById('gameContent');
+            
+            let choicesHTML = '';
+            if (levelNum < 5) {
+                choicesHTML = '<div class="choices">';
+                level.choices.forEach((choice, index) => {
+                    choicesHTML += `<button class="choice-btn" onclick="selectChoice(${index}, ${levelNum})">${choice.text}</button>`;
+                });
+                choicesHTML += '</div>';
+            } else {
+                choicesHTML = '<div class="choices"><button class="choice-btn" onclick="restartGame()">🚀 Bắt Đầu Cuộc Phiêu Lưu Mới</button></div>';
+            }
+
+            gameContent.innerHTML = `
+                <div class="story-section">
+                    <h2>${level.title}</h2>
+                    <p>${level.story}</p>
+                </div>
+                
+                <div class="code-block">${level.codeChallenge}</div>
+                
+                <div class="concept-explanation">
+                    <strong>💡 Khoảnh Khắc Học Tập:</strong> ${level.explanation}
+                </div>
+                
+                ${choicesHTML}
+            `;
+
+            if (levelNum === 5) {
+                document.getElementById('restartBtn').style.display = 'block';
+            }
+        }
+
+        // Xử lý lựa chọn đáp án
+        function selectChoice(choiceIndex, levelNum) {
+            const level = storyData[levelNum];
+            const choice = level.choices[choiceIndex];
+            
+            // Cập nhật điểm số và thống kê
+            gameState.score += choice.points;
+            if (choice.correct) {
+                gameState.conceptsLearned++;
+                gameState.level++;
+            }
+
+            // Phản hồi trực quan
+            const buttons = document.querySelectorAll('.choice-btn');
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === choiceIndex) {
+                    btn.classList.add(choice.correct ? 'correct' : 'incorrect');
+                }
+            });
+
+            // Cập nhật hiển thị
+            updateDisplay();
+
+            // Chuyển sang cấp độ tiếp theo sau khi delay
+            setTimeout(() => {
+                if (choice.correct && gameState.level <= 5) {
+                    loadLevel(gameState.level);
+                } else if (!choice.correct) {
+                    // Hiển thị giải thích và tự động chuyển sang cấp độ tiếp theo
+                    const gameContent = document.getElementById('gameContent');
+                    gameContent.innerHTML += `
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin: 15px 0; text-align: center;">
+                            <strong>🤔 Chưa đúng rồi!</strong><br>
+                            Đừng lo - học hỏi từ sai lầm cũng là một phần của cuộc phiêu lưu!<br>
+                            <small>Sẽ chuyển sang thử thách tiếp theo trong 3 giây...</small>
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        gameState.level++;
+                        if (gameState.level <= 5) {
+                            loadLevel(gameState.level);
+                        }
+                    }, 3000);
+                }
+            }, 2000);
+        }
+
+        // Khởi động lại game
+        function restartGame() {
+            gameState = {
+                level: 1,
+                score: 0,
+                conceptsLearned: 0,
+                playerName: '',
+                inventory: []
+            };
+            
+            document.getElementById('restartBtn').style.display = 'none';
+            updateDisplay();
+            loadLevel(1);
+        }
+
+        // Bắt đầu game khi trang tải xong
+        window.onload = initGame;
+    </script>
+</body>
+</html>
